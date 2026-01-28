@@ -386,7 +386,6 @@ const quizData = [
     answer: 2,
     explanation: "NHN Cloud는 안정적인 인프라와 기술력을 바탕으로 기업용 클라우드 서비스를 제공합니다."
   }
-  const additionalQuizData = [
   // [영역 1: 클라우드 개념 및 보안 - 9문제]
   {
     id: 51,
@@ -814,5 +813,4 @@ const quizData = [
     answer: 2,
     explanation: "무료 혜택 범위를 벗어나면 등록된 결제 수단으로 자동 과금이 시작됩니다."
   }
-];
 ];
