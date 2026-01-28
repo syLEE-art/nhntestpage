@@ -1,6 +1,6 @@
 /**
- * NHN Cloud 자격증 모의고사 - 메인 스크립트 (다중 선택 지원 버전)
- * 4지선다 + 5지선다(2개 선택) 모두 지원
+ * NHN Cloud 자격증 모의고사 - 메인 스크립트
+ * 문제 수 선택 기능 (30 / 60 / 전체) + 다중 선택 지원
  */
 
 (function() {
@@ -12,11 +12,13 @@
     const state = {
         currentPage: 1,
         questionsPerPage: 10,
-        userAnswers: {}, // 단일 선택: 숫자, 다중 선택: 배열 [1, 2] 형태
+        userAnswers: {},
         isSubmitted: false,
         score: 0,
         correctCount: 0,
-        shuffledQuiz: []
+        shuffledQuiz: [],
+        selectedQuestionCount: 60,  // 선택된 문제 수 (기본값 60)
+        totalAvailable: 0           // 전체 문제 수
     };
 
     // ===================================
@@ -43,13 +45,17 @@
         retryBtn: document.getElementById('retryBtn'),
         reviewSection: document.getElementById('reviewSection'),
         reviewContainer: document.getElementById('reviewContainer'),
-        scrollTopBtn: document.getElementById('scrollTopBtn')
+        scrollTopBtn: document.getElementById('scrollTopBtn'),
+        // 문제 수 선택 관련
+        countBtns: document.querySelectorAll('.count-btn'),
+        availableCount: document.getElementById('availableCount'),
+        selectedCount: document.getElementById('selectedCount'),
+        allCountDisplay: document.getElementById('allCountDisplay')
     };
 
     // ===================================
     // 상수 정의
     // ===================================
-    // [수정] 5개 이상 보기 지원을 위해 마커 확장
     const MARKERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
     // ===================================
@@ -65,12 +71,10 @@
         return shuffled;
     }
 
-    // 정답 비교 함수 (단일/다중 공용)
     function checkIsCorrect(userAns, realAns) {
         if (Array.isArray(realAns)) {
             if (!Array.isArray(userAns)) return false;
             if (userAns.length !== realAns.length) return false;
-            // 정렬 후 비교 (순서 무관)
             const sortedUser = [...userAns].sort((a, b) => a - b);
             const sortedReal = [...realAns].sort((a, b) => a - b);
             return sortedUser.every((val, idx) => val === sortedReal[idx]);
@@ -104,7 +108,6 @@
         return div.innerHTML;
     }
 
-    // [수정] 마커 가져오기 (범위 초과 방지)
     function getMarker(index) {
         return MARKERS[index] || String(index + 1);
     }
@@ -119,9 +122,26 @@
                 alert('유효한 문제 데이터가 없습니다.');
                 return;
             }
-            elements.startTotalCount.textContent = validData.length;
-            elements.totalCount.textContent = validData.length;
+            
+            state.totalAvailable = validData.length;
             window.validatedQuizData = validData;
+            
+            // 화면에 총 문제 수 표시
+            elements.startTotalCount.textContent = validData.length;
+            elements.availableCount.textContent = validData.length;
+            elements.allCountDisplay.textContent = validData.length;
+            
+            // 기본 선택 문제 수 설정 (전체가 60개 미만이면 전체로)
+            if (validData.length < 60) {
+                state.selectedQuestionCount = validData.length;
+                elements.selectedCount.textContent = validData.length;
+                // 전체 버튼 활성화
+                elements.countBtns.forEach(btn => btn.classList.remove('active'));
+                document.querySelector('[data-count="all"]')?.classList.add('active');
+            } else {
+                elements.selectedCount.textContent = '60';
+            }
+            
             setupEventListeners();
             console.log(`✅ 총 ${validData.length}개의 문제가 로드되었습니다.`);
         } catch (error) {
@@ -134,24 +154,69 @@
         elements.submitBtn?.addEventListener('click', submitQuiz);
         elements.reviewBtn?.addEventListener('click', showReview);
         elements.retryBtn?.addEventListener('click', retryQuiz);
+        
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', (e) => filterReview(e.target.dataset.filter));
         });
+        
         window.addEventListener('scroll', handleScroll);
         elements.scrollTopBtn?.addEventListener('click', scrollToTop);
+        
+        // 문제 수 선택 버튼 이벤트
+        elements.countBtns.forEach(btn => {
+            btn.addEventListener('click', handleCountSelect);
+        });
     }
 
+    // ===================================
+    // 문제 수 선택 핸들러
+    // ===================================
+    function handleCountSelect(e) {
+        const btn = e.currentTarget;
+        const count = btn.dataset.count;
+        
+        // 버튼 활성화 상태 변경
+        elements.countBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        // 선택된 문제 수 설정
+        if (count === 'all') {
+            state.selectedQuestionCount = state.totalAvailable;
+            elements.selectedCount.textContent = state.totalAvailable;
+        } else {
+            const numCount = parseInt(count);
+            // 전체 문제 수보다 크면 전체로 제한
+            state.selectedQuestionCount = Math.min(numCount, state.totalAvailable);
+            elements.selectedCount.textContent = state.selectedQuestionCount;
+        }
+        
+        // 시작 화면의 총 문제 수도 업데이트
+        elements.startTotalCount.textContent = state.selectedQuestionCount;
+    }
+
+    // ===================================
+    // 퀴즈 시작
+    // ===================================
     function startQuiz() {
-        state.shuffledQuiz = shuffleArray(window.validatedQuizData || quizData);
+        // 전체 문제 섞기
+        const allShuffled = shuffleArray(window.validatedQuizData || quizData);
+        
+        // 선택된 개수만큼만 가져오기
+        state.shuffledQuiz = allShuffled.slice(0, state.selectedQuestionCount);
+        
+        // 총 문제 수 표시 업데이트
+        elements.totalCount.textContent = state.shuffledQuiz.length;
+        
         elements.startScreen.classList.add('hidden');
         elements.quizScreen.classList.remove('hidden');
+        
         renderQuestions();
         renderPagination();
         updateProgress();
     }
 
     // ===================================
-    // 렌더링 (다중 선택 + 채점 표시 통합)
+    // 렌더링
     // ===================================
     function renderQuestions() {
         const startIdx = (state.currentPage - 1) * state.questionsPerPage;
@@ -163,7 +228,6 @@
             const userAns = state.userAnswers[q.id];
             const isAnswered = userAns !== undefined && (Array.isArray(userAns) ? userAns.length > 0 : true);
             
-            // [수정] 제출 후 정답/오답 상태 결정
             let cardStateClass = '';
             if (state.isSubmitted) {
                 cardStateClass = checkIsCorrect(userAns, q.answer) ? 'correct' : 'wrong';
@@ -171,7 +235,6 @@
                 cardStateClass = 'answered';
             }
             
-            // 다중 선택 안내 텍스트
             const multiHint = q.isMulti ? `<span class="multi-badge">${q.requiredSelections}개 선택</span>` : '';
             
             return `
@@ -188,7 +251,6 @@
                                 ? (userAns || []).includes(optionNum)
                                 : userAns === optionNum;
                             
-                            // [수정] 제출 후 정답/오답 스타일
                             let labelClass = '';
                             if (state.isSubmitted) {
                                 const isCorrectAnswer = q.isMulti 
@@ -236,7 +298,6 @@
             `;
         }).join('');
         
-        // [수정] 제출 전에만 이벤트 리스너 등록
         if (!state.isSubmitted) {
             document.querySelectorAll('.option-input').forEach(input => {
                 input.addEventListener('change', handleOptionSelect);
@@ -257,7 +318,6 @@
             }
             
             if (e.target.checked) {
-                // [수정] 최대 선택 개수 제한
                 if (state.userAnswers[questionId].length < question.requiredSelections) {
                     state.userAnswers[questionId].push(selectedOption);
                 } else {
@@ -376,7 +436,6 @@
             elements.scoreProgress.style.strokeDashoffset = circumference - (state.score / 100) * circumference;
         }, 100);
         
-        // 등급 표시
         let gradeClass, gradeText;
         if (state.score >= 90) {
             gradeClass = 'excellent';
@@ -475,11 +534,6 @@
                 </div>
             `;
         }).join('');
-    }
-
-    // [수정] 채점된 문제 표시 - renderQuestions()가 이미 처리하므로 단순 호출
-    function showGradedQuestions() {
-        renderQuestions();
     }
 
     function retryQuiz() {

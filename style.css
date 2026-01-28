@@ -993,3 +993,109 @@ body {
 .multi-select.wrong .question-number {
     background: var(--error);
 }
+
+/* ===================================
+   문제 수 선택 섹션
+   =================================== */
+
+.question-count-section {
+    margin: 32px 0;
+    padding: 24px;
+    background: var(--gray-50);
+    border-radius: 16px;
+    border: 1px solid var(--gray-200);
+}
+
+.section-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.count-options {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.count-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    height: 80px;
+    background: var(--white);
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.count-btn:hover {
+    border-color: var(--primary-blue);
+    background: var(--primary-blue-light);
+}
+
+.count-btn.active {
+    border-color: var(--primary-blue);
+    background: var(--primary-blue);
+    color: var(--white);
+}
+
+.count-btn.active .count-number,
+.count-btn.active .count-label {
+    color: var(--white);
+}
+
+.count-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray-800);
+    line-height: 1.2;
+}
+
+.count-label {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-top: 4px;
+}
+
+.count-hint {
+    text-align: center;
+    font-size: 14px;
+    color: var(--gray-500);
+}
+
+.count-hint strong {
+    color: var(--primary-blue);
+    font-weight: 600;
+}
+
+/* 반응형 - 문제 수 선택 */
+@media (max-width: 480px) {
+    .count-options {
+        gap: 8px;
+    }
+    
+    .count-btn {
+        width: 75px;
+        height: 70px;
+    }
+    
+    .count-number {
+        font-size: 20px;
+    }
+    
+    .count-label {
+        font-size: 11px;
+    }
+    
+    .question-count-section {
+        padding: 16px;
+        margin: 24px 0;
+    }
+}
