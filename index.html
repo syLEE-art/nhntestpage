@@ -91,6 +91,17 @@
                         <path d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                     </svg>
                 </button>
+                
+                <!-- 틀린 문제 복습 버튼 (세션에 데이터 있을 때만 표시) -->
+                <button class="btn btn-secondary btn-large hidden" id="reviewWrongBtn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    틀린 문제 복습 (<span id="wrongCountBadge">0</span>문제)
+                </button>
+                <button class="btn btn-outline btn-small hidden" id="clearWrongBtn">
+                    틀린 문제 기록 삭제
+                </button>
             </div>
         </section>
 

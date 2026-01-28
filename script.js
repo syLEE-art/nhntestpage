@@ -18,7 +18,8 @@
         correctCount: 0,
         shuffledQuiz: [],
         selectedQuestionCount: 60,  // 선택된 문제 수 (기본값 60)
-        totalAvailable: 0           // 전체 문제 수
+        totalAvailable: 0,          // 전체 문제 수
+        isReviewMode: false         // 틀린 문제 복습 모드 여부
     };
 
     // ===================================
@@ -50,13 +51,87 @@
         countBtns: document.querySelectorAll('.count-btn'),
         availableCount: document.getElementById('availableCount'),
         selectedCount: document.getElementById('selectedCount'),
-        allCountDisplay: document.getElementById('allCountDisplay')
+        allCountDisplay: document.getElementById('allCountDisplay'),
+        // 틀린 문제 복습 관련
+        reviewWrongBtn: document.getElementById('reviewWrongBtn'),
+        wrongCountBadge: document.getElementById('wrongCountBadge'),
+        clearWrongBtn: document.getElementById('clearWrongBtn')
     };
 
     // ===================================
     // 상수 정의
     // ===================================
     const MARKERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    const STORAGE_KEY = 'nhn_quiz_wrong_questions';
+
+    // ===================================
+    // 세션 스토리지 관련 함수
+    // ===================================
+    
+    /**
+     * 틀린 문제 ID 목록을 세션 스토리지에 저장
+     */
+    function saveWrongQuestions(wrongIds) {
+        try {
+            // 기존 틀린 문제와 병합 (중복 제거)
+            const existing = getWrongQuestionIds();
+            const merged = [...new Set([...existing, ...wrongIds])];
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            console.log(`💾 틀린 문제 ${merged.length}개 저장됨`);
+        } catch (e) {
+            console.error('세션 스토리지 저장 오류:', e);
+        }
+    }
+    
+    /**
+     * 세션 스토리지에서 틀린 문제 ID 목록 가져오기
+     */
+    function getWrongQuestionIds() {
+        try {
+            const data = sessionStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.error('세션 스토리지 읽기 오류:', e);
+            return [];
+        }
+    }
+    
+    /**
+     * 틀린 문제 기록 삭제
+     */
+    function clearWrongQuestions() {
+        sessionStorage.removeItem(STORAGE_KEY);
+        updateWrongQuestionsUI();
+        console.log('🗑️ 틀린 문제 기록 삭제됨');
+    }
+    
+    /**
+     * 틀린 문제 복습 버튼 UI 업데이트
+     */
+    function updateWrongQuestionsUI() {
+        const wrongIds = getWrongQuestionIds();
+        const hasWrongQuestions = wrongIds.length > 0;
+        
+        if (elements.reviewWrongBtn) {
+            elements.reviewWrongBtn.classList.toggle('hidden', !hasWrongQuestions);
+        }
+        if (elements.wrongCountBadge) {
+            elements.wrongCountBadge.textContent = wrongIds.length;
+        }
+        if (elements.clearWrongBtn) {
+            elements.clearWrongBtn.classList.toggle('hidden', !hasWrongQuestions);
+        }
+    }
+    
+    /**
+     * 복습 모드에서 맞춘 문제는 틀린 문제 목록에서 제거
+     */
+    function removeFromWrongQuestions(correctIds) {
+        const existing = getWrongQuestionIds();
+        const updated = existing.filter(id => !correctIds.includes(id));
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+        console.log(`✅ ${correctIds.length}개 문제가 복습 완료되어 제거됨`);
+    }
 
     // ===================================
     // 유틸리티 함수
@@ -181,6 +256,9 @@
                 elements.selectedCount.textContent = '60';
             }
             
+            // 틀린 문제 복습 버튼 UI 업데이트
+            updateWrongQuestionsUI();
+            
             setupEventListeners();
             console.log(`✅ 총 ${validData.length}개의 문제가 로드되었습니다.`);
         } catch (error) {
@@ -205,6 +283,52 @@
         elements.countBtns.forEach(btn => {
             btn.addEventListener('click', handleCountSelect);
         });
+        
+        // 틀린 문제 복습 버튼 이벤트
+        elements.reviewWrongBtn?.addEventListener('click', startReviewMode);
+        elements.clearWrongBtn?.addEventListener('click', () => {
+            if (confirm('틀린 문제 기록을 삭제하시겠습니까?')) {
+                clearWrongQuestions();
+            }
+        });
+    }
+
+    // ===================================
+    // 틀린 문제 복습 모드
+    // ===================================
+    function startReviewMode() {
+        const wrongIds = getWrongQuestionIds();
+        if (wrongIds.length === 0) {
+            alert('복습할 틀린 문제가 없습니다.');
+            return;
+        }
+        
+        // 틀린 문제만 필터링
+        const wrongQuestions = (window.validatedQuizData || quizData)
+            .filter(q => wrongIds.includes(q.id));
+        
+        if (wrongQuestions.length === 0) {
+            alert('저장된 틀린 문제를 찾을 수 없습니다.');
+            clearWrongQuestions();
+            return;
+        }
+        
+        state.isReviewMode = true;
+        
+        // 문제 및 보기 섞기
+        const shuffled = shuffleArray(wrongQuestions);
+        state.shuffledQuiz = shuffled.map(q => shuffleOptions(q));
+        
+        // UI 업데이트
+        elements.totalCount.textContent = state.shuffledQuiz.length;
+        elements.startScreen.classList.add('hidden');
+        elements.quizScreen.classList.remove('hidden');
+        
+        renderQuestions();
+        renderPagination();
+        updateProgress();
+        
+        console.log(`📝 틀린 문제 복습 모드: ${state.shuffledQuiz.length}개 문제`);
     }
 
     // ===================================
@@ -237,6 +361,8 @@
     // 퀴즈 시작
     // ===================================
     function startQuiz() {
+        state.isReviewMode = false;  // 일반 모드
+        
         // 전체 문제 섞기
         const allShuffled = shuffleArray(window.validatedQuizData || quizData);
         
@@ -456,14 +582,30 @@
         state.isSubmitted = true;
         
         let correctCount = 0;
+        const wrongIds = [];
+        const correctIds = [];
+        
         state.shuffledQuiz.forEach(q => {
             if (checkIsCorrect(state.userAnswers[q.id], q.answer)) {
                 correctCount++;
+                correctIds.push(q.id);
+            } else {
+                wrongIds.push(q.id);
             }
         });
         
         state.correctCount = correctCount;
         state.score = Math.round((correctCount / state.shuffledQuiz.length) * 100);
+        
+        // 틀린 문제 세션 스토리지에 저장
+        if (wrongIds.length > 0) {
+            saveWrongQuestions(wrongIds);
+        }
+        
+        // 복습 모드에서 맞춘 문제는 틀린 문제 목록에서 제거
+        if (state.isReviewMode && correctIds.length > 0) {
+            removeFromWrongQuestions(correctIds);
+        }
         
         showResult();
     }
@@ -587,6 +729,7 @@
         state.score = 0;
         state.correctCount = 0;
         state.shuffledQuiz = [];
+        state.isReviewMode = false;  // 복습 모드 리셋
         
         elements.resultScreen.classList.add('hidden');
         elements.reviewSection.classList.add('hidden');
@@ -598,6 +741,9 @@
         if (elements.scoreProgress) {
             elements.scoreProgress.style.strokeDashoffset = 339.292;
         }
+        
+        // 틀린 문제 복습 버튼 UI 업데이트
+        updateWrongQuestionsUI();
         
         window.scrollTo({ top: 0 });
     }
