@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHN Cloud 자격증 모의고사</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 상단 고정 헤더 -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </span>
+                <span class="logo-text">NHN Cloud</span>
+                <span class="logo-badge">자격증 모의고사</span>
+            </div>
+            <div class="header-stats">
+                <span class="answered-count">답변: <strong id="answeredCount">0</strong> / <span id="totalCount">0</span></span>
+            </div>
+        </div>
+        <!-- 진행률 바 -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+        <!-- 시작 화면 -->
+        <section class="start-screen" id="startScreen">
+            <div class="start-card">
+                <div class="start-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h1>NHN Cloud 자격증 모의고사</h1>
+                <p class="start-description">
+                    NHN Cloud 핵심 서비스와 인프라 구조에 대한<br>
+                    이해도를 점검하는 모의고사입니다.
+                </p>
+                <div class="start-info">
+                    <div class="info-item">
+                        <span class="info-label">문제 수</span>
+                        <span class="info-value" id="startTotalCount">0</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">문제 유형</span>
+                        <span class="info-value">4지선다</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">페이지당</span>
+                        <span class="info-value">10문제</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-large" id="startBtn">
+                    시험 시작하기
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                    </svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- 퀴즈 화면 -->
+        <section class="quiz-screen hidden" id="quizScreen">
+            <div class="quiz-container" id="quizContainer">
+                <!-- 문제들이 여기에 렌더링됨 -->
+            </div>
+            
+            <!-- 페이지네이션 -->
+            <div class="pagination" id="pagination">
+                <!-- 페이지 버튼이 여기에 렌더링됨 -->
+            </div>
+
+            <!-- 제출 버튼 -->
+            <div class="submit-section" id="submitSection">
+                <div class="submit-warning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <span>제출 후에는 답변을 수정할 수 없습니다.</span>
+                </div>
+                <button class="btn btn-primary btn-large" id="submitBtn">
+                    최종 제출하기
+                </button>
+            </div>
+        </section>
+
+        <!-- 결과 화면 -->
+        <section class="result-screen hidden" id="resultScreen">
+            <div class="result-card">
+                <div class="result-header">
+                    <h2>시험 결과</h2>
+                </div>
+                <div class="result-score">
+                    <div class="score-circle" id="scoreCircle">
+                        <svg viewBox="0 0 120 120">
+                            <circle class="score-bg" cx="60" cy="60" r="54"/>
+                            <circle class="score-progress" cx="60" cy="60" r="54" id="scoreProgress"/>
+                        </svg>
+                        <div class="score-text">
+                            <span class="score-value" id="scoreValue">0</span>
+                            <span class="score-unit">점</span>
+                        </div>
+                    </div>
+                    <p class="result-summary" id="resultSummary">0개 중 0개 정답</p>
+                </div>
+                <div class="result-grade" id="resultGrade">
+                    <!-- 등급 표시 -->
+                </div>
+                <div class="result-actions">
+                    <button class="btn btn-secondary" id="reviewBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        오답 확인하기
+                    </button>
+                    <button class="btn btn-primary" id="retryBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        다시 풀기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 오답 리뷰 섹션 -->
+            <div class="review-section hidden" id="reviewSection">
+                <h3 class="review-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    문제 리뷰
+                </h3>
+                <div class="review-filter">
+                    <button class="filter-btn active" data-filter="wrong">틀린 문제만</button>
+                    <button class="filter-btn" data-filter="all">전체 문제</button>
+                </div>
+                <div class="review-container" id="reviewContainer">
+                    <!-- 리뷰 문제들이 여기에 렌더링됨 -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 페이지 상단 이동 버튼 -->
+    <button class="scroll-top hidden" id="scrollTopBtn" aria-label="맨 위로 이동">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 15l7-7 7 7"/>
+        </svg>
+    </button>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
