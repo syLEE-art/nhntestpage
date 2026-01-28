@@ -71,6 +71,45 @@
         return shuffled;
     }
 
+    /**
+     * 보기(options) 순서를 섞고 정답도 함께 업데이트
+     * @param {Object} question - 문제 객체
+     * @returns {Object} - 보기가 섞인 새 문제 객체
+     */
+    function shuffleOptions(question) {
+        const options = question.options;
+        const originalAnswer = question.answer;
+        
+        // 인덱스 배열 생성 및 섞기 [0, 1, 2, 3, ...]
+        const indices = options.map((_, idx) => idx);
+        const shuffledIndices = shuffleArray(indices);
+        
+        // 섞인 순서로 옵션 재배열
+        const shuffledOptions = shuffledIndices.map(idx => options[idx]);
+        
+        // 정답 위치 업데이트
+        let newAnswer;
+        if (Array.isArray(originalAnswer)) {
+            // 다중 선택: 각 정답의 새 위치 찾기
+            newAnswer = originalAnswer.map(ans => {
+                const originalIdx = ans - 1; // 1-based → 0-based
+                const newIdx = shuffledIndices.indexOf(originalIdx);
+                return newIdx + 1; // 0-based → 1-based
+            });
+        } else {
+            // 단일 선택: 정답의 새 위치 찾기
+            const originalIdx = originalAnswer - 1;
+            const newIdx = shuffledIndices.indexOf(originalIdx);
+            newAnswer = newIdx + 1;
+        }
+        
+        return {
+            ...question,
+            options: shuffledOptions,
+            answer: newAnswer
+        };
+    }
+
     function checkIsCorrect(userAns, realAns) {
         if (Array.isArray(realAns)) {
             if (!Array.isArray(userAns)) return false;
@@ -202,7 +241,10 @@
         const allShuffled = shuffleArray(window.validatedQuizData || quizData);
         
         // 선택된 개수만큼만 가져오기
-        state.shuffledQuiz = allShuffled.slice(0, state.selectedQuestionCount);
+        const selectedQuestions = allShuffled.slice(0, state.selectedQuestionCount);
+        
+        // 각 문제의 보기(options)도 섞기
+        state.shuffledQuiz = selectedQuestions.map(q => shuffleOptions(q));
         
         // 총 문제 수 표시 업데이트
         elements.totalCount.textContent = state.shuffledQuiz.length;
@@ -213,6 +255,8 @@
         renderQuestions();
         renderPagination();
         updateProgress();
+        
+        console.log('✅ 문제 및 보기 순서가 섞였습니다.');
     }
 
     // ===================================
