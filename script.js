@@ -14,8 +14,21 @@
         userAnswers: {},
         isSubmitted: false,
         score: 0,
-        correctCount: 0
+        correctCount: 0,
+        shuffledQuiz: []  // 셔플된 문제 배열
     };
+
+    // ===================================
+    // 문제 셔플 함수 (Fisher-Yates 알고리즘)
+    // ===================================
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
 
     // ===================================
     // DOM 요소 캐싱
@@ -93,6 +106,9 @@
     // 퀴즈 시작
     // ===================================
     function startQuiz() {
+        // 문제 순서 무작위 셔플
+        state.shuffledQuiz = shuffleArray(quizData);
+        
         elements.startScreen.classList.add('hidden');
         elements.quizScreen.classList.remove('hidden');
         
@@ -106,8 +122,8 @@
     // ===================================
     function renderQuestions() {
         const startIdx = (state.currentPage - 1) * state.questionsPerPage;
-        const endIdx = Math.min(startIdx + state.questionsPerPage, quizData.length);
-        const questionsToShow = quizData.slice(startIdx, endIdx);
+        const endIdx = Math.min(startIdx + state.questionsPerPage, state.shuffledQuiz.length);
+        const questionsToShow = state.shuffledQuiz.slice(startIdx, endIdx);
         
         elements.quizContainer.innerHTML = questionsToShow.map((q, idx) => {
             const globalIdx = startIdx + idx;
@@ -180,7 +196,7 @@
     // ===================================
     function updateProgress() {
         const answered = Object.keys(state.userAnswers).length;
-        const total = quizData.length;
+        const total = state.shuffledQuiz.length;
         const percentage = (answered / total) * 100;
         
         elements.answeredCount.textContent = answered;
@@ -191,7 +207,7 @@
     // 페이지네이션
     // ===================================
     function renderPagination() {
-        const totalPages = Math.ceil(quizData.length / state.questionsPerPage);
+        const totalPages = Math.ceil(state.shuffledQuiz.length / state.questionsPerPage);
         
         let html = '';
         
@@ -242,7 +258,7 @@
 
     function handlePageClick(e) {
         const page = e.target.dataset.page;
-        const totalPages = Math.ceil(quizData.length / state.questionsPerPage);
+        const totalPages = Math.ceil(state.shuffledQuiz.length / state.questionsPerPage);
         
         if (page === 'prev') {
             state.currentPage = Math.max(1, state.currentPage - 1);
@@ -265,7 +281,7 @@
     // ===================================
     function submitQuiz() {
         // 미응답 문제 확인
-        const unanswered = quizData.length - Object.keys(state.userAnswers).length;
+        const unanswered = state.shuffledQuiz.length - Object.keys(state.userAnswers).length;
         
         if (unanswered > 0) {
             const confirmSubmit = confirm(`아직 ${unanswered}개의 문제에 답하지 않았습니다.\n그래도 제출하시겠습니까?`);
@@ -276,14 +292,14 @@
         
         // 채점
         let correctCount = 0;
-        quizData.forEach(q => {
+        state.shuffledQuiz.forEach(q => {
             if (state.userAnswers[q.id] === q.answer) {
                 correctCount++;
             }
         });
         
         state.correctCount = correctCount;
-        state.score = Math.round((correctCount / quizData.length) * 100);
+        state.score = Math.round((correctCount / state.shuffledQuiz.length) * 100);
         
         // 결과 화면 표시
         showResult();
@@ -298,7 +314,7 @@
         
         // 점수 표시
         elements.scoreValue.textContent = state.score;
-        elements.resultSummary.textContent = `${quizData.length}개 중 ${state.correctCount}개 정답`;
+        elements.resultSummary.textContent = `${state.shuffledQuiz.length}개 중 ${state.correctCount}개 정답`;
         
         // 점수 원형 애니메이션
         const circumference = 2 * Math.PI * 54; // r=54
@@ -351,9 +367,9 @@
         // 문제 필터링
         let questionsToShow;
         if (filter === 'wrong') {
-            questionsToShow = quizData.filter(q => state.userAnswers[q.id] !== q.answer);
+            questionsToShow = state.shuffledQuiz.filter(q => state.userAnswers[q.id] !== q.answer);
         } else {
-            questionsToShow = quizData;
+            questionsToShow = state.shuffledQuiz;
         }
         
         if (questionsToShow.length === 0) {
@@ -369,7 +385,7 @@
         elements.reviewContainer.innerHTML = questionsToShow.map((q, idx) => {
             const userAnswer = state.userAnswers[q.id];
             const isCorrect = userAnswer === q.answer;
-            const originalIdx = quizData.findIndex(item => item.id === q.id);
+            const originalIdx = state.shuffledQuiz.findIndex(item => item.id === q.id);
             
             return `
                 <div class="question-card ${isCorrect ? 'correct' : 'wrong'}">
@@ -428,7 +444,7 @@
         
         cards.forEach(card => {
             const qId = parseInt(card.dataset.id);
-            const question = quizData.find(q => q.id === qId);
+            const question = state.shuffledQuiz.find(q => q.id === qId);
             const userAnswer = state.userAnswers[qId];
             const isCorrect = userAnswer === question.answer;
             
@@ -477,6 +493,7 @@
         state.isSubmitted = false;
         state.score = 0;
         state.correctCount = 0;
+        state.shuffledQuiz = [];
         
         // UI 초기화
         elements.resultScreen.classList.add('hidden');
