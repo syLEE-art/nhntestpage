@@ -1669,4 +1669,4 @@ const quizData = [
         explanation: "SLA 위반 시 정의된 기준에 따라 요금의 일부를 크레딧 등으로 보상합니다."
     }
 ];
-];
+
