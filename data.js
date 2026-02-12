@@ -240,7 +240,7 @@ const quizData = [
       "Cloud Database",
       "SQL Server Service"
     ],
-    answer: 2,
+    answer: 1,
     explanation: "NHN Cloud는 관리형 DB 서비스로 RDS for MySQL 등을 제공합니다."
   },
   {
