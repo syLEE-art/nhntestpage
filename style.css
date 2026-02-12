@@ -1165,3 +1165,294 @@ body {
     font-weight: 600;
     margin-left: 8px;
 }
+
+/* ===================================
+   깃발(Flag) 버튼 스타일
+   =================================== */
+
+.flag-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: var(--gray-100);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.flag-btn:hover {
+    background: var(--warning-light);
+    color: var(--warning);
+}
+
+.flag-btn.active {
+    background: var(--warning);
+    color: white;
+}
+
+.flag-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.question-card {
+    position: relative;
+}
+
+.question-card.flagged {
+    border-left: 4px solid var(--warning);
+}
+
+.question-card.flagged .question-number {
+    background: var(--warning);
+}
+
+.question-card.highlight {
+    animation: highlightPulse 1.5s ease;
+}
+
+@keyframes highlightPulse {
+    0%, 100% { box-shadow: var(--shadow-md); }
+    50% { box-shadow: 0 0 0 4px rgba(26, 115, 232, 0.3), var(--shadow-lg); }
+}
+
+/* ===================================
+   네비게이션 맵 스타일
+   =================================== */
+
+.nav-map {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: calc(100% - 40px);
+}
+
+.nav-map-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: var(--shadow-lg);
+    margin-left: auto;
+    transition: all 0.2s ease;
+}
+
+.nav-map-toggle:hover {
+    background: var(--primary-blue-dark);
+    transform: translateY(-2px);
+}
+
+.nav-map-content {
+    position: absolute;
+    bottom: 56px;
+    right: 0;
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow-xl);
+    padding: 16px;
+    max-height: 60vh;
+    overflow-y: auto;
+    width: 100%;
+    min-width: 320px;
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.nav-map.collapsed .nav-map-content {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+/* 통계 */
+.nav-map-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gray-200);
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.stat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.stat-dot.answered {
+    background: var(--primary-blue);
+}
+
+.stat-dot.unanswered {
+    background: var(--gray-300);
+}
+
+.stat-dot.flagged {
+    background: var(--warning);
+}
+
+/* 필터 버튼 */
+.nav-filter-btns {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.nav-filter-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--gray-200);
+    background: var(--white);
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--gray-600);
+}
+
+.nav-filter-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+}
+
+.nav-filter-btn.active {
+    background: var(--primary-blue);
+    color: white;
+    border-color: var(--primary-blue);
+}
+
+/* 그리드 */
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 6px;
+}
+
+.nav-cell {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--gray-200);
+    background: var(--gray-100);
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    color: var(--gray-500);
+}
+
+.nav-cell:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
+    z-index: 1;
+}
+
+.nav-cell.answered {
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
+    color: white;
+}
+
+.nav-cell.unanswered {
+    background: var(--gray-100);
+    border-color: var(--gray-200);
+    color: var(--gray-500);
+}
+
+.nav-cell.flagged {
+    border-color: var(--warning);
+    box-shadow: inset 0 0 0 2px var(--warning);
+}
+
+.nav-cell.flagged.answered {
+    background: linear-gradient(135deg, var(--primary-blue) 50%, var(--warning) 50%);
+}
+
+.nav-cell.current-page {
+    outline: 2px solid var(--primary-blue-dark);
+    outline-offset: 2px;
+}
+
+.nav-cell.filtered-out {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.cell-flag {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    font-size: 10px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .nav-map {
+        bottom: 80px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        width: auto;
+    }
+    
+    .nav-map-content {
+        min-width: auto;
+        max-height: 50vh;
+    }
+    
+    .nav-map-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .nav-grid {
+        grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+    }
+    
+    .nav-cell {
+        width: 32px;
+        height: 32px;
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-filter-btns {
+        justify-content: center;
+    }
+    
+    .nav-map-stats {
+        justify-content: center;
+    }
+}

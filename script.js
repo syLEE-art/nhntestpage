@@ -19,7 +19,9 @@
         shuffledQuiz: [],
         selectedQuestionCount: 60,  // 선택된 문제 수 (기본값 60)
         totalAvailable: 0,          // 전체 문제 수
-        isReviewMode: false         // 틀린 문제 복습 모드 여부
+        isReviewMode: false,        // 틀린 문제 복습 모드 여부
+        flaggedQuestions: new Set(), // 깃발 표시된 문제 ID
+        navFilter: 'all'            // 네비게이션 필터: 'all', 'unanswered', 'flagged'
     };
 
     // ===================================
@@ -55,7 +57,12 @@
         // 틀린 문제 복습 관련
         reviewWrongBtn: document.getElementById('reviewWrongBtn'),
         wrongCountBadge: document.getElementById('wrongCountBadge'),
-        clearWrongBtn: document.getElementById('clearWrongBtn')
+        clearWrongBtn: document.getElementById('clearWrongBtn'),
+        // 네비게이션 맵 관련
+        navMap: document.getElementById('navMap'),
+        navMapToggle: document.getElementById('navMapToggle'),
+        navMapGrid: document.getElementById('navMapGrid'),
+        navFilterBtns: null  // 동적으로 할당
     };
 
     // ===================================
@@ -291,6 +298,9 @@
                 clearWrongQuestions();
             }
         });
+        
+        // 네비게이션 맵 토글 이벤트
+        elements.navMapToggle?.addEventListener('click', toggleNavigationMap);
     }
 
     // ===================================
@@ -314,6 +324,8 @@
         }
         
         state.isReviewMode = true;
+        state.flaggedQuestions = new Set();  // 깃발 리셋
+        state.navFilter = 'all';  // 필터 리셋
         
         // 문제 및 보기 섞기
         const shuffled = shuffleArray(wrongQuestions);
@@ -362,6 +374,8 @@
     // ===================================
     function startQuiz() {
         state.isReviewMode = false;  // 일반 모드
+        state.flaggedQuestions = new Set();  // 깃발 리셋
+        state.navFilter = 'all';  // 필터 리셋
         
         // 전체 문제 섞기
         const allShuffled = shuffleArray(window.validatedQuizData || quizData);
@@ -397,6 +411,7 @@
             const globalIdx = startIdx + idx;
             const userAns = state.userAnswers[q.id];
             const isAnswered = userAns !== undefined && (Array.isArray(userAns) ? userAns.length > 0 : true);
+            const isFlagged = state.flaggedQuestions.has(q.id);
             
             let cardStateClass = '';
             if (state.isSubmitted) {
@@ -408,10 +423,16 @@
             const multiHint = q.isMulti ? `<span class="multi-badge">${q.requiredSelections}개 선택</span>` : '';
             
             return `
-                <div class="question-card ${cardStateClass} ${q.isMulti ? 'multi-select' : ''}" data-id="${q.id}">
+                <div class="question-card ${cardStateClass} ${q.isMulti ? 'multi-select' : ''} ${isFlagged ? 'flagged' : ''}" data-id="${q.id}" data-index="${globalIdx}">
                     <div class="question-header">
                         <span class="question-number">${globalIdx + 1}</span>
                         ${multiHint}
+                        <button class="flag-btn ${isFlagged ? 'active' : ''}" data-id="${q.id}" title="깃발 표시">
+                            <svg viewBox="0 0 24 24" fill="${isFlagged ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+                                <line x1="4" y1="22" x2="4" y2="15"/>
+                            </svg>
+                        </button>
                         <p class="question-text">${escapeHtml(q.question)}</p>
                     </div>
                     <ul class="options-list">
@@ -468,13 +489,52 @@
             `;
         }).join('');
         
+        // 이벤트 리스너 등록
         if (!state.isSubmitted) {
             document.querySelectorAll('.option-input').forEach(input => {
                 input.addEventListener('change', handleOptionSelect);
             });
         }
         
+        // 깃발 버튼 이벤트 등록
+        document.querySelectorAll('.flag-btn').forEach(btn => {
+            btn.addEventListener('click', handleFlagToggle);
+        });
+        
+        // 네비게이션 맵 업데이트
+        renderNavigationMap();
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    /**
+     * 깃발 토글 핸들러
+     */
+    function handleFlagToggle(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const btn = e.currentTarget;
+        const questionId = parseInt(btn.dataset.id);
+        
+        if (state.flaggedQuestions.has(questionId)) {
+            state.flaggedQuestions.delete(questionId);
+            btn.classList.remove('active');
+            btn.querySelector('svg').setAttribute('fill', 'none');
+        } else {
+            state.flaggedQuestions.add(questionId);
+            btn.classList.add('active');
+            btn.querySelector('svg').setAttribute('fill', 'currentColor');
+        }
+        
+        // 카드에도 flagged 클래스 토글
+        const card = btn.closest('.question-card');
+        if (card) {
+            card.classList.toggle('flagged', state.flaggedQuestions.has(questionId));
+        }
+        
+        // 네비게이션 맵 업데이트
+        renderNavigationMap();
     }
 
     function handleOptionSelect(e) {
@@ -522,6 +582,164 @@
         const total = state.shuffledQuiz.length;
         elements.answeredCount.textContent = answered;
         elements.progressBar.style.width = total > 0 ? `${(answered / total) * 100}%` : '0%';
+        
+        // 네비게이션 맵도 업데이트
+        renderNavigationMap();
+    }
+
+    // ===================================
+    // 네비게이션 맵 (전체 문제 번호판)
+    // ===================================
+    function renderNavigationMap() {
+        if (!elements.navMapGrid) return;
+        
+        const total = state.shuffledQuiz.length;
+        const answeredCount = Object.keys(state.userAnswers).filter(key => {
+            const ans = state.userAnswers[key];
+            return Array.isArray(ans) ? ans.length > 0 : ans !== undefined;
+        }).length;
+        const flaggedCount = state.flaggedQuestions.size;
+        const unansweredCount = total - answeredCount;
+        
+        // 필터된 문제 인덱스 가져오기
+        const filteredIndices = getFilteredQuestionIndices();
+        
+        // 통계 업데이트
+        const statsHtml = `
+            <div class="nav-map-stats">
+                <span class="stat-item">
+                    <span class="stat-dot answered"></span>
+                    답변: ${answeredCount}
+                </span>
+                <span class="stat-item">
+                    <span class="stat-dot unanswered"></span>
+                    미답변: ${unansweredCount}
+                </span>
+                <span class="stat-item">
+                    <span class="stat-dot flagged"></span>
+                    깃발: ${flaggedCount}
+                </span>
+            </div>
+        `;
+        
+        // 필터 버튼
+        const filterHtml = `
+            <div class="nav-filter-btns">
+                <button class="nav-filter-btn ${state.navFilter === 'all' ? 'active' : ''}" data-filter="all">
+                    전체 (${total})
+                </button>
+                <button class="nav-filter-btn ${state.navFilter === 'unanswered' ? 'active' : ''}" data-filter="unanswered">
+                    미답변 (${unansweredCount})
+                </button>
+                <button class="nav-filter-btn ${state.navFilter === 'flagged' ? 'active' : ''}" data-filter="flagged">
+                    🚩 깃발 (${flaggedCount})
+                </button>
+            </div>
+        `;
+        
+        // 그리드 생성
+        let gridHtml = '<div class="nav-grid">';
+        
+        state.shuffledQuiz.forEach((q, idx) => {
+            const questionNum = idx + 1;
+            const userAns = state.userAnswers[q.id];
+            const isAnswered = userAns !== undefined && (Array.isArray(userAns) ? userAns.length > 0 : true);
+            const isFlagged = state.flaggedQuestions.has(q.id);
+            const isCurrentPage = Math.ceil(questionNum / state.questionsPerPage) === state.currentPage;
+            
+            // 필터링: 해당 문제가 현재 필터에 포함되는지 확인
+            const isVisible = filteredIndices.includes(idx);
+            
+            let statusClass = 'unanswered';
+            if (isAnswered) statusClass = 'answered';
+            
+            gridHtml += `
+                <button class="nav-cell ${statusClass} ${isFlagged ? 'flagged' : ''} ${isCurrentPage ? 'current-page' : ''} ${!isVisible ? 'filtered-out' : ''}"
+                        data-index="${idx}" 
+                        data-id="${q.id}"
+                        title="문제 ${questionNum}${isFlagged ? ' (깃발)' : ''}${isAnswered ? ' (답변완료)' : ' (미답변)'}">
+                    ${questionNum}
+                    ${isFlagged ? '<span class="cell-flag">🚩</span>' : ''}
+                </button>
+            `;
+        });
+        
+        gridHtml += '</div>';
+        
+        elements.navMapGrid.innerHTML = statsHtml + filterHtml + gridHtml;
+        
+        // 필터 버튼 이벤트
+        elements.navMapGrid.querySelectorAll('.nav-filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                state.navFilter = e.target.dataset.filter;
+                renderNavigationMap();
+            });
+        });
+        
+        // 셀 클릭 이벤트 (해당 페이지로 이동)
+        elements.navMapGrid.querySelectorAll('.nav-cell').forEach(cell => {
+            cell.addEventListener('click', (e) => {
+                const idx = parseInt(e.currentTarget.dataset.index);
+                const targetPage = Math.ceil((idx + 1) / state.questionsPerPage);
+                
+                if (targetPage !== state.currentPage) {
+                    state.currentPage = targetPage;
+                    renderQuestions();
+                    renderPagination();
+                }
+                
+                // 해당 문제로 스크롤
+                setTimeout(() => {
+                    const questionId = parseInt(e.currentTarget.dataset.id);
+                    const targetCard = document.querySelector(`.question-card[data-id="${questionId}"]`);
+                    if (targetCard) {
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetCard.classList.add('highlight');
+                        setTimeout(() => targetCard.classList.remove('highlight'), 1500);
+                    }
+                }, 100);
+            });
+        });
+    }
+    
+    /**
+     * 현재 필터에 맞는 문제 인덱스 배열 반환
+     */
+    function getFilteredQuestionIndices() {
+        const indices = [];
+        
+        state.shuffledQuiz.forEach((q, idx) => {
+            const userAns = state.userAnswers[q.id];
+            const isAnswered = userAns !== undefined && (Array.isArray(userAns) ? userAns.length > 0 : true);
+            const isFlagged = state.flaggedQuestions.has(q.id);
+            
+            switch (state.navFilter) {
+                case 'unanswered':
+                    if (!isAnswered) indices.push(idx);
+                    break;
+                case 'flagged':
+                    if (isFlagged) indices.push(idx);
+                    break;
+                default: // 'all'
+                    indices.push(idx);
+            }
+        });
+        
+        return indices;
+    }
+    
+    /**
+     * 네비게이션 맵 토글
+     */
+    function toggleNavigationMap() {
+        const navMap = elements.navMap;
+        if (navMap) {
+            navMap.classList.toggle('collapsed');
+            const toggleBtn = elements.navMapToggle;
+            if (toggleBtn) {
+                toggleBtn.textContent = navMap.classList.contains('collapsed') ? '📋 문제 맵 열기' : '📋 문제 맵 닫기';
+            }
+        }
     }
 
     // ===================================
@@ -730,6 +948,8 @@
         state.correctCount = 0;
         state.shuffledQuiz = [];
         state.isReviewMode = false;  // 복습 모드 리셋
+        state.flaggedQuestions = new Set();  // 깃발 리셋
+        state.navFilter = 'all';  // 필터 리셋
         
         elements.resultScreen.classList.add('hidden');
         elements.reviewSection.classList.add('hidden');
