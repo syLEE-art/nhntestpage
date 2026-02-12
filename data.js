@@ -2302,5 +2302,331 @@ const quizData = [
     ],
     answer: 2,
     explanation: "SLA 위반 시 정의된 기준에 따라 요금의 일부를 크레딧 등으로 보상합니다."
+  },
+  // [영역 1: 클라우드 개념 및 보안 - 5문제]
+  {
+    id: 180,
+    question: "국내 보안 인증 제도 중 정보보호와 개인정보보호를 관리하는 체계로, NHN Cloud가 획득한 인증의 명칭은?",
+    options: ["ISMS-P", "ISO 9001", "PMP", "CSAP"],
+    answer: 1,
+    explanation: "ISMS-P는 정보보호 및 개인정보보호 관리체계 인증으로, NHN Cloud는 이를 획득하여 안정성을 입증했습니다."
+  },
+  {
+    id: 181,
+    question: "NHN Cloud가 준수하거나 획득한 글로벌 보안 및 품질 인증 2가지를 고르세요.",
+    options: [
+      "SOC 1/2/3",
+      "K-Water 인증",
+      "ISO/IEC 27001",
+      "Green IT 인증",
+      "UNESCO 문화인프라 인증"
+    ],
+    answer: [1, 3],
+    explanation: "글로벌 표준인 ISO 27001과 서비스 조직 통제 수준을 평가하는 SOC 인증을 획득하고 있습니다."
+  },
+  {
+    id: 182,
+    question: "온프레미스(로컬 IDC)와 퍼블릭 클라우드를 연결하여 유연하게 자원을 배분하는 구성 방식을 무엇이라 합니까?",
+    options: ["하이브리드 클라우드", "멀티 클라우드", "프라이빗 클라우드", "에지 클라우드"],
+    answer: 1,
+    explanation: "하이브리드 클라우드는 서로 다른 두 환경(주로 사설과 공용)을 연결한 구성을 말합니다."
+  },
+  {
+    id: 183,
+    question: "책임 공유 모델에서 NHN Cloud가 담당하는 '플랫폼 보안' 영역에 해당하는 것 2가지는?",
+    options: [
+      "하이퍼바이저(Hypervisor) 보안",
+      "사용자 애플리케이션 보안",
+      "데이터베이스 엔진(RDS용) 관리 및 패치",
+      "고객 데이터 암호화 설정",
+      "네트워크 ACL의 허용 규칙 설정"
+    ],
+    answer: [1, 3],
+    explanation: "하이퍼바이저와 관리형 서비스(RDS 등)의 엔진 레벨 보안은 클라우드 제공자의 책임입니다."
+  },
+  {
+    id: 184,
+    question: "클라우드 거버넌스(Governance)를 위해 NHN Cloud가 제공하는 '조직' 기능의 주된 목적은?",
+    options: ["자원 생성 속도 향상", "일관된 정책 관리 및 통합 관리 환경 제공", "서버 하드웨어 직접 교체", "무료 자원 무제한 제공"],
+    answer: 2,
+    explanation: "조직 기능을 통해 전사적 정책 적용, 멤버 관리, 통합 결제 등 거버넌스를 실현할 수 있습니다."
+  },
+
+  // [영역 2: NHN Cloud 서비스 특징 - 10문제]
+  {
+    id: 185,
+    question: "NHN Cloud에서 제공하는 관리형 쿠버네티스 서비스의 명칭은?",
+    options: ["NKS (NHN Kubernetes Service)", "NEC (NHN Engine Container)", "NCS (NHN Cloud Server)", "NKE (NHN Kubernetes Engine)"],
+    answer: 1,
+    explanation: "NHN Cloud의 관리형 쿠버네티스 서비스 정식 명칭은 NKS입니다."
+  },
+  {
+    id: 186,
+    question: "웹 서비스에 대한 공격(SQL Injection, XSS 등)을 차단하기 위해 사용하는 보안 서비스 2개는?",
+    options: [
+      "WAF (Web Application Firewall)",
+      "VPC Peering",
+      "App Security",
+      "Direct Connect",
+      "DNS"
+    ],
+    answer: [1, 3],
+    explanation: "WAF와 App Security는 웹 및 모바일 애플리케이션 계층의 공격을 방어합니다."
+  },
+  {
+    id: 187,
+    question: "NHN Cloud 리전 중 미국 지역에 위치하여 글로벌 서비스를 지원하는 리전은?",
+    options: ["USA (California) 리전", "USA (New York) 리전", "USA (Virginia) 리전", "USA (Texas) 리전"],
+    answer: 1,
+    explanation: "NHN Cloud는 미국 캘리포니아 리전을 운영하고 있습니다."
+  },
+  {
+    id: 188,
+    question: "NHN Cloud의 게임 플랫폼 서비스 'Gamebase'가 제공하는 기능 2가지는?",
+    options: [
+      "인증 및 결제 통합 지원",
+      "서버 하드웨어 조립",
+      "지표 분석 및 푸시 알림",
+      "VPC 네트워크 설계 자동화",
+      "데이터베이스 인덱싱 자동 수정"
+    ],
+    answer: [1, 3],
+    explanation: "Gamebase는 게임 개발에 필수적인 인증, 결제, 운영 지표 등의 기능을 통합 제공합니다."
+  },
+  {
+    id: 189,
+    question: "API 호출을 효율적으로 관리하고 인증 및 트래픽을 제어하는 서비스의 명칭은?",
+    options: ["API Gateway", "API Bridge", "API Loader", "API Console"],
+    answer: 1,
+    explanation: "API Gateway는 대규모 API 호출을 처리하고 인증 및 유량 제어를 담당합니다."
+  },
+  {
+    id: 190,
+    question: "NHN Cloud Marketplace를 이용할 때의 장점 2가지는?",
+    options: [
+      "검증된 솔루션(이미지)을 즉시 도입할 수 있다.",
+      "모든 유료 소프트웨어를 무료로 사용할 수 있다.",
+      "NHN Cloud 요금과 통합하여 정산이 가능하다.",
+      "서버의 물리적인 위치를 직접 바꿀 수 있다.",
+      "인터넷 연결 없이도 모든 기능을 쓸 수 있다."
+    ],
+    answer: [1, 3],
+    explanation: "마켓플레이스는 신뢰할 수 있는 솔루션을 쉽고 빠르게 구축하고 비용을 통합 관리하게 돕습니다."
+  },
+  {
+    id: 191,
+    question: "NHN Cloud의 컨테이너 이미지 저장소 서비스의 명칭은?",
+    options: ["NCR (NHN Container Registry)", "NHN Docker Hub", "NCS (NHN Container Storage)", "NCR (NHN Cloud Repository)"],
+    answer: 1,
+    explanation: "NCR(NHN Container Registry)은 컨테이너 이미지를 안전하게 관리하는 저장소입니다."
+  },
+  {
+    id: 192,
+    question: "NHN Cloud의 'Search' 서비스(Cloud Search)에 대한 설명으로 옳은 것 2가지는?",
+    options: [
+      "대용량 데이터를 빠르게 검색할 수 있는 기능을 제공한다.",
+      "오직 텍스트 파일만 검색 가능하다.",
+      "RESTful API 기반으로 검색 엔진 연동이 가능하다.",
+      "네트워크 선로의 물리적 단락을 검색한다.",
+      "사용자의 이메일 본문을 강제로 검색한다."
+    ],
+    answer: [1, 3],
+    explanation: "Cloud Search는 대용량 데이터에 대한 전문 검색(Full-text Search) 기능을 API 형태로 제공합니다."
+  },
+  {
+    id: 193,
+    question: "VPC 내부에서만 사용 가능한 전용 도메인 이름을 설정하고 관리하는 서비스는?",
+    options: ["Private DNS", "Local DNS", "Internal Host", "VPC DNS"],
+    answer: 1,
+    explanation: "Private DNS는 VPC 내부 네트워크에서만 식별되는 도메인을 관리합니다."
+  },
+  {
+    id: 194,
+    question: "DDoS Guard 서비스가 방어하는 주된 공격 형태 2가지는?",
+    options: [
+      "대량의 트래픽을 유발하는 네트워크 부하 공격",
+      "서버실 내부의 물리적 침입",
+      "정상적인 접근을 위장한 서비스 거부 공격",
+      "관리자의 패스워드 분실",
+      "결제 시스템의 해킹"
+    ],
+    answer: [1, 3],
+    explanation: "DDoS Guard는 네트워크 및 전송 계층에서 발생하는 대규모 유량 공격을 차단합니다."
+  },
+
+  // [영역 3: NHN Cloud 서비스 활용 기술 - 12문제]
+  {
+    id: 195,
+    question: "IAM 서비스에서 '역할(Role)'과 '정책(Policy)'의 관계에 대한 설명으로 옳은 것은?",
+    options: [
+      "정책은 역할 내부에 포함되어 구체적인 권한을 정의한다.",
+      "역할은 정책보다 항상 우선순위가 낮다.",
+      "정책은 오직 이메일 발송 권한만 가진다.",
+      "둘은 완전히 다른 서비스로 서로 연동되지 않는다."
+    ],
+    answer: 1,
+    explanation: "정책은 어떤 행동을 할 수 있는지 정의하며, 이를 역할에 연결하여 권한을 부여합니다."
+  },
+  {
+    id: 196,
+    question: "VPC 서브넷을 설계할 때 주의해야 할 사항 2가지는?",
+    options: [
+      "사용할 IP 주소 개수에 맞춰 CIDR 범위를 적절히 설정해야 한다.",
+      "서브넷은 여러 가용성 영역(AZ)에 걸쳐 생성할 수 있다.",
+      "용도(WEB/WAS/DB)에 따라 퍼블릭과 프라이빗 서브넷을 분리하는 것이 좋다.",
+      "하나의 VPC에는 하나의 서브넷만 생성 가능하다.",
+      "서브넷 이름은 반드시 영어 대문자로만 만들어야 한다."
+    ],
+    answer: [1, 3],
+    explanation: "서브넷은 한 AZ에 귀속되며, 보안을 위해 계층별로 분리 설계하는 것이 권장됩니다."
+  },
+  {
+    id: 197,
+    question: "이미 생성된 플로팅 IP를 다른 인스턴스로 옮기기 위한 단계로 옳은 것은?",
+    options: [
+      "기존 인스턴스에서 연결 해제(Dissociate) 후 새 인스턴스에 연결(Associate)",
+      "플로팅 IP를 삭제하고 새로 생성",
+      "두 인스턴스를 하나로 합치기",
+      "네트워크 카드를 물리적으로 교체"
+    ],
+    answer: 1,
+    explanation: "연결 해제 후 재연결을 통해 공인 IP 주소를 다른 자원으로 이전할 수 있습니다."
+  },
+  {
+    id: 198,
+    question: "자원 관리의 효율성을 높이기 위한 '태그(Tag)' 활용 사례 2가지는?",
+    options: [
+      "비용 센터별로 태그를 붙여 부서별 요금을 정산한다.",
+      "태그를 사용하여 서버의 CPU 속도를 높인다.",
+      "환경(Dev/Prod)별로 태그를 구분하여 자원을 검색한다.",
+      "태그를 붙이면 보안 그룹 설정이 필요 없어진다.",
+      "태그 정보는 인터넷상에 항상 공개된다."
+    ],
+    answer: [1, 3],
+    explanation: "태그는 자원 분류, 비용 분석, 자동화 스크립트 실행 등에 활용됩니다."
+  },
+  {
+    id: 199,
+    question: "NHN Cloud 프로젝트에서 자원 생성 한도(Quota)를 초과해야 할 때의 올바른 절차는?",
+    options: [
+      "고객 센터의 1:1 문의 또는 증설 요청 프로세스를 이용한다.",
+      "인스턴스를 강제로 더 많이 만든다.",
+      "비밀번호를 바꾼다.",
+      "새로운 회원 계정을 하나 더 만든다."
+    ],
+    answer: 1,
+    explanation: "기본 쿼터는 안정적인 운영을 위해 존재하며, 요청 시 심사를 통해 상향이 가능합니다."
+  },
+  {
+    id: 200,
+    question: "모니터링 알람(Alarm)을 설정할 때 선택할 수 있는 조건 2가지는?",
+    options: [
+      "특정 임계치(Threshold) 초과 시",
+      "서버의 물리적 먼지 농도 변화",
+      "데이터 발생이 일정 기간 없을 때",
+      "결제 카드 한도가 줄어들 때",
+      "리전의 날씨 변화"
+    ],
+    answer: [1, 3],
+    explanation: "수치 기반 임계치 도달이나 데이터 수집 중단 등을 감지하여 알람을 보낼 수 있습니다."
+  },
+  {
+    id: 201,
+    question: "Log & Crash Search에서 수집된 로그 데이터를 외부로 내보내는(Export) 기능에 대한 설명으로 옳은 것은?",
+    options: [
+      "Object Storage로 로그 파일을 전송하여 장기 보관할 수 있다.",
+      "오직 엑셀 파일로만 내보낼 수 있다.",
+      "내보내기 기능은 유료 결제 후에만 활성화된다.",
+      "내보낸 데이터는 자동으로 암호화가 풀린다."
+    ],
+    answer: 1,
+    explanation: "수집된 대량의 로그를 분석하거나 보관하기 위해 오브젝트 스토리지로 내보낼 수 있습니다."
+  },
+  {
+    id: 202,
+    question: "NHN Cloud에서 인스턴스 이미지를 다른 리전으로 복제(Replication)하기 위한 필수 조건 2가지는?",
+    options: [
+      "소스 이미지에서 스냅샷 또는 이미지를 추출해야 한다.",
+      "두 리전의 요금이 반드시 같아야 한다.",
+      "대상 리전에 대한 사용 권한이 있어야 한다.",
+      "인스턴스가 반드시 '실행 중' 상태여야 한다.",
+      "전용선을 통해서만 복제가 가능하다."
+    ],
+    answer: [1, 3],
+    explanation: "이미지를 기반으로 타 리전 복제 기능을 사용하여 전역 인프라를 구축할 수 있습니다."
+  },
+  {
+    id: 203,
+    question: "NHN Cloud 블록 스토리지 타입 중 입출력 성능(IOPS)을 보장하기 위해 주로 사용하는 타입은?",
+    options: ["SSD 타입", "HDD 타입", "Tape 타입", "CD 타입"],
+    answer: 1,
+    explanation: "높은 성능이 필요한 데이터베이스나 서비스에는 SSD 타입 스토리지를 사용합니다."
+  },
+  {
+    id: 204,
+    question: "VPC 피어링 연결 시 고려해야 할 기술적 제약 사항 2가지는?",
+    options: [
+      "두 VPC의 IP 대역(CIDR)이 겹치면 연결할 수 없다.",
+      "리전이 다르면 피어링 연결이 불가능하다.",
+      "피어링 체결 후 라우팅 테이블 설정을 직접 해주어야 한다.",
+      "피어링을 맺으면 보안 그룹 설정이 자동으로 해제된다.",
+      "피어링은 최대 2개까지만 연결 가능하다."
+    ],
+    answer: [1, 3],
+    explanation: "IP 중복 불가와 라우팅 규칙 수동 추가가 피어링의 핵심 기술 포인트입니다."
+  },
+  {
+    id: 205,
+    question: "DNS 서비스에서 도메인을 다른 도메인 이름으로 연결(별칭)할 때 사용하는 레코드 타입은?",
+    options: ["CNAME", "A", "MX", "TXT"],
+    answer: 1,
+    explanation: "CNAME 레코드는 하나의 도메인 별칭을 다른 도메인으로 매핑할 때 사용합니다."
+  },
+  {
+    id: 206,
+    question: "RDS 서비스의 고가용성 구성(Multi-AZ)에서 장애 발생 시의 동작 방식 2가지는?",
+    options: [
+      "대기중인(Standby) 복제본으로 자동 페일오버(Failover)된다.",
+      "장애 발생 시 모든 데이터가 삭제된다.",
+      "애플리케이션의 접속 주소(Endpoint)는 그대로 유지된다.",
+      "사용자가 직접 수동으로 서버를 교체해야 한다.",
+      "장애 기간 동안의 요금은 발생하지 않는다."
+    ],
+    answer: [1, 3],
+    explanation: "Multi-AZ 구성은 장애 시 자동으로 예비 서버로 전환되며 엔드포인트가 바뀌지 않아 서비스 연속성을 보장합니다."
+  },
+
+  // [영역 4: 결제 및 요금 - 3문제]
+  {
+    id: 207,
+    question: "조직(Organization) 단위의 통합 결제 기능을 사용할 때의 특징은?",
+    options: [
+      "조직 내 여러 프로젝트의 발생 비용을 합산하여 한 번에 결제할 수 있다.",
+      "통합 결제를 하면 모든 서비스가 50% 할인된다.",
+      "각 프로젝트 멤버가 비용을 나누어서 낸다.",
+      "통합 결제 수단은 오직 계좌 이체만 가능하다."
+    ],
+    answer: 1,
+    explanation: "조직 OWNER는 통합 결제 설정을 통해 조직 내 프로젝트들의 비용 정산을 일원화할 수 있습니다."
+  },
+  {
+    id: 208,
+    question: "NHN Cloud 요금 정산 시 '크레딧(Credit)'의 소멸 및 정책에 대한 설명으로 옳은 것 2가지는?",
+    options: [
+      "부여된 유효 기간이 지나면 사용하지 않아도 소멸한다.",
+      "크레딧은 유료 서비스 결제 시 현금보다 늦게 차감된다.",
+      "이벤트나 보상으로 지급된 크레딧은 현금으로 환불되지 않는다.",
+      "모든 크레딧은 한 번 받으면 영구적으로 유지된다.",
+      "타인에게 자유롭게 선물할 수 있다."
+    ],
+    answer: [1, 3],
+    explanation: "크레딧은 기간 제한이 있으며 현금 자산과는 다른 정책을 가집니다."
+  },
+  {
+    id: 209,
+    question: "결제 관련 정보를 조회하거나 결제 수단을 관리하기 위해 필요한 IAM 역할은?",
+    options: ["BILLING_ADMIN (또는 결제 관리 권한)", "MEMBER", "VIEWER", "NETWORK_ADMIN"],
+    answer: 1,
+    explanation: "비용 및 결제 정보는 보안이 중요하므로 전용 관리 권한이 부여된 사용자만 접근 가능합니다."
   }
 ];
