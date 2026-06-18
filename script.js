@@ -25,6 +25,41 @@
     };
 
     // ===================================
+    // 구글 스프레드시트 데이터 연동
+    // ===================================
+    const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReQVdB9J2ivzz-hhxks4F_Nn90ibO-I_Vl9COYK_kKIS4R_Cu3lWOWJvK28iF9o9HjAYTpQ6SvNGAC/pub?gid=0&single=true&output=csv';
+
+    async function fetchQuizDataFromSheet() {
+        try {
+            const response = await fetch(SPREADSHEET_URL);
+            const data = await response.text();
+            const lines = data.split('\n').slice(1);
+            
+            return lines.map((line, index) => {
+                const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.replace(/^"|"$/g, '').trim());
+                if (cols.length < 9) return null;
+                
+                const options = [cols[3], cols[4], cols[5], cols[6], cols[7]].filter(opt => opt !== "");
+                let answer = cols[8].includes(',') ? cols[8].split(',').map(Number) : Number(cols[8]);
+
+                return {
+                    id: index + 1,
+                    category: cols[1],
+                    question: cols[2],
+                    options: options,
+                    answer: answer,
+                    explanation: cols[9] || '해설이 없습니다.'
+                };
+            }).filter(item => item !== null);
+        } catch (e) {
+            console.error("데이터 로딩 실패:", e);
+            return [];
+        }
+    }
+    
+    // quizData 오류 방지를 위한 전역 변수 선언
+    let quizData = [];
+    // ===================================
     // DOM 요소 캐싱
     // ===================================
     const elements = {
@@ -236,11 +271,17 @@
     // ===================================
     // 초기화 및 이벤트
     // ===================================
-    function init() {
+    async function init() {
         try {
+            // 로딩 표시 (선택 사항)
+            elements.startTotalCount.textContent = '로딩 중...';
+            
+            // 시트에서 데이터 가져오기
+            quizData = await fetchQuizDataFromSheet();
+            
             const validData = validateQuizData(quizData);
             if (validData.length === 0) {
-                alert('유효한 문제 데이터가 없습니다.');
+                alert('유효한 문제 데이터가 없습니다. 스프레드시트 링크를 확인해주세요.');
                 return;
             }
             
