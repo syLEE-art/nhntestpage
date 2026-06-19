@@ -209,13 +209,17 @@
         if (Array.isArray(originalAnswer)) {
             // 다중 선택: 각 정답의 새 위치 찾기
             newAnswer = originalAnswer.map(ans => {
-                const originalIdx = ans - 1; // 1-based → 0-based
+                // 💡 방어 코드: 혹시 정답이 0으로 들어오면 1로 보정
+                const normalizedAns = ans > 0 ? ans : ans + 1; 
+                const originalIdx = normalizedAns - 1; 
                 const newIdx = shuffledIndices.indexOf(originalIdx);
-                return newIdx + 1; // 0-based → 1-based
+                return newIdx + 1;
             });
         } else {
             // 단일 선택: 정답의 새 위치 찾기
-            const originalIdx = originalAnswer - 1;
+            // 💡 방어 코드: 혹시 정답이 0으로 들어오면 1로 보정
+            const normalizedAns = originalAnswer > 0 ? originalAnswer : originalAnswer + 1;
+            const originalIdx = normalizedAns - 1;
             const newIdx = shuffledIndices.indexOf(originalIdx);
             newAnswer = newIdx + 1;
         }
