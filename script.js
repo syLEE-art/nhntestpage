@@ -63,6 +63,7 @@
     // DOM 요소 캐싱
     // ===================================
     const elements = {
+        mainTitle: document.getElementById('mainTitle'),
         startScreen: document.getElementById('startScreen'),
         quizScreen: document.getElementById('quizScreen'),
         resultScreen: document.getElementById('resultScreen'),
@@ -319,6 +320,7 @@
     }
 
     function setupEventListeners() {
+        elements.mainTitle?.addEventListener('click', goToMainScreen);
         elements.startBtn?.addEventListener('click', startQuiz);
         elements.submitBtn?.addEventListener('click', submitQuiz);
         elements.reviewBtn?.addEventListener('click', showReview);
@@ -330,6 +332,40 @@
         
         window.addEventListener('scroll', handleScroll);
         elements.scrollTopBtn?.addEventListener('click', scrollToTop);
+        
+        // 메인 화면으로 이동
+    function goToMainScreen() {
+        // 시험을 푸는 도중(답변이 있고 제출 전)일 때만 경고창 띄우기
+        const hasAnswers = Object.keys(state.userAnswers).length > 0;
+        if (hasAnswers && !state.isSubmitted && !elements.quizScreen.classList.contains('hidden')) {
+            if (!confirm('정말 처음 화면으로 돌아가시겠습니까?\n진행 중인 문제 풀이 내역은 모두 삭제됩니다.')) {
+                return;
+            }
+        }
+        
+        // 상태 초기화
+        state.currentPage = 1;
+        state.userAnswers = {};
+        state.isSubmitted = false;
+        state.score = 0;
+        state.correctCount = 0;
+        state.shuffledQuiz = [];
+        state.isReviewMode = false;
+        state.flaggedQuestions = new Set();
+        state.navFilter = 'all';
+        
+        // UI 초기화 (진행률 바 등)
+        elements.progressBar.style.width = '0%';
+        elements.answeredCount.textContent = '0';
+        
+        // 화면 전환
+        elements.quizScreen.classList.add('hidden');
+        elements.resultScreen.classList.add('hidden');
+        elements.reviewSection.classList.add('hidden');
+        elements.startScreen.classList.remove('hidden');
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
         
         // 문제 수 선택 버튼 이벤트
         elements.countBtns.forEach(btn => {
