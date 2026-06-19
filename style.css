@@ -353,6 +353,7 @@ body {
     line-height: 1.6;
     flex: 1;
     padding-top: 6px;
+    padding-right: 45px; /* 💡 이 줄을 추가하세요. 깃발 버튼이 차지할 공간을 확보해 글자가 겹치지 않게 합니다. */
 }
 
 /* Options */
